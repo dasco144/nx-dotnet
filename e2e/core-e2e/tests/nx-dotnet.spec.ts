@@ -25,6 +25,7 @@ import { readDependenciesFromNxDepGraph } from '@nx-dotnet/utils/e2e';
 import { exec, execSync } from 'child_process';
 import { ensureDirSync } from 'fs-extra';
 import { Workspaces } from '@nrwl/tao/src/shared/workspace';
+import { PackageJson } from 'nx/src/utils/package-json';
 
 const e2eDir = tmpProjPath();
 
@@ -59,8 +60,10 @@ describe('nx-dotnet e2e', () => {
 
     runCommand('git checkout -b "affected-tests"');
     updateFile('package.json', (f) => {
-      const json = JSON.parse(f);
-      json.dependencies['@nrwl/angular'] = 'latest';
+      const json: PackageJson = JSON.parse(f);
+      json.devDependencies ??= {};
+      json.devDependencies['@nrwl/angular'] =
+        json.devDependencies['@nrwl/workspace'];
       return JSON.stringify(json);
     });
     runPackageManagerInstall();
